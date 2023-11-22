@@ -1,3 +1,3 @@
-import { AuthDataSourceImplementation } from './infrastructure/auth_data_source_implementation';
+import { AuthRepositoryImplementation } from './infrastructure/auth_repository_implementation';
 
-export const authRepository = new AuthDataSourceImplementation();
+export const authRepository = new AuthRepositoryImplementation();

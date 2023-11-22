@@ -1,2 +1,13 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+	import authStore from '$lib/auth/aplication/authStore';
+	import App from './App.svelte';
+	import Login from './Login.svelte';
+
+	let user = authStore.user;
+</script>
+
+{#if $user}
+	<App />
+{:else}
+	<Login />
+{/if}

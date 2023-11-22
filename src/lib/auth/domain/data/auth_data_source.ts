@@ -2,6 +2,6 @@ import type { User } from '..';
 
 export interface AuthDataSource {
 	loginGoogle(): Promise<boolean>;
-	logOut(): Promise<User>;
-	checkUser(): Promise<User>;
+	logOut(): Promise<boolean>;
+	checkUser(): Promise<User | null>;
 }

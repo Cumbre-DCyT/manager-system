@@ -8,13 +8,13 @@ export class AuthRepositoryImplementation implements AuthRepository {
 		this.authDataSource = authDataSource ?? new AuthDataSourceImplementation();
 	}
 
-	loginGoogle(): Promise<User> {
-		throw new Error('Method not implemented.');
+	loginGoogle(): Promise<boolean> {
+		return this.authDataSource.loginGoogle();
 	}
-	logOut(): Promise<User> {
-		throw new Error('Method not implemented.');
+	logOut(): Promise<boolean> {
+		return this.authDataSource.logOut();
 	}
-	checkUser(): Promise<User> {
-		throw new Error('Method not implemented.');
+	checkUser(): Promise<User | null> {
+		return this.authDataSource.checkUser();
 	}
 }
