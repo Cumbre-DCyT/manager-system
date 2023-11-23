@@ -1,3 +1,3 @@
-import { AuthRepositoryImplementation } from './infrastructure/auth_repository_implementation';
+import { AuthRepositoryImplementation } from './infrastructure/authRepositoryImplementation';
 
 export const authRepository = new AuthRepositoryImplementation();

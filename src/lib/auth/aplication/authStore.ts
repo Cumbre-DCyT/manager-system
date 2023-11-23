@@ -8,10 +8,12 @@ export default {
 	get user() {
 		return userStore;
 	},
+
 	async loginGoogle() {
 		const result = await authRepository.loginGoogle();
 		if (result) userStore.set(await authRepository.checkUser());
 	},
+
 	async logOut() {
 		const result = await authRepository.logOut();
 		if (result) {

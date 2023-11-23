@@ -1,5 +1,5 @@
 import type { AuthDataSource, AuthRepository, User } from '../domain';
-import { AuthDataSourceImplementation } from './auth_data_source_implementation';
+import { AuthDataSourceImplementation } from './authDataSourceImplementation';
 
 export class AuthRepositoryImplementation implements AuthRepository {
 	protected authDataSource: AuthDataSource;
