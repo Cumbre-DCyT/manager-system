@@ -15,5 +15,32 @@ export interface Oauth2 {
 		client_id: string;
 		scope: string;
 		callback: string;
-	}) => void;
+	}) => AuthClient;
+}
+
+export interface TokenResponse {
+	accessToken: string;
+	tokenType: string;
+	expiresIn: number;
+	scope: string;
+	authuser: string;
+	prompt: string;
+	error?: {
+		status: number;
+		message: string;
+	};
+}
+
+export interface AuthClient {
+	m: string;
+	o: O;
+	l: string;
+	u: boolean;
+	callback: string | ((Token: TokenResponse) => Promise<void>);
+	requestAccessToken: ({ prompt }: { prompt: string }) => void;
+}
+
+export interface O {
+	clientID: string;
+	scope: string;
 }

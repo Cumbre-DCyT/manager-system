@@ -1,29 +1,31 @@
-import type { oauth2Interface } from './domain/google';
+import type { AuthClient, TokenResponse } from './domain/google';
 
-export class gapisService {
+export class GApisService {
 	private discoveryDocs = 'https://forms.googleapis.com/$discovery/rest?version=v1';
 
-	private authClient: any;
-	private apiClient: any;
+	private authClient?: AuthClient;
 
-	apiKey = 'AIzaSyDHyCyMN0U0HJQ6kKcBIxwDyrnbnDuW7oo';
-	clientID = '69363678559-a2q8ruuaaj0jc9557iuhg8qvv2ce9h72.apps.googleusercontent.com';
-	scope =
-		'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/forms.body';
+	apiKey: string;
+	clientID: string;
+	scope: string;
 
 	gapiInited = false;
 	gisInited = false;
 
+	constructor(apiKey: string, clientID: string, scope: string) {
+		this.apiKey = apiKey;
+		this.clientID = clientID;
+		this.scope = scope;
+	}
+
 	authRequestGoogle(callback: () => Promise<void>) {
 		if (!this.authClient) return;
-
-		this.authClient.callback = async (tokenResponse: any) => {
+		this.authClient.callback = async (tokenResponse: TokenResponse) => {
 			if (tokenResponse.error !== undefined) {
 				throw tokenResponse;
 			}
 			await callback();
 		};
-
 		if (window.gapi.client.getToken() === null) {
 			this.authClient.requestAccessToken({ prompt: 'consent' });
 		} else {
@@ -32,23 +34,21 @@ export class gapisService {
 	}
 
 	gapiLoaded() {
-		this.apiClient.load('client', this.initializeGapiClient);
-	}
-
-	async initializeGapiClient(gapi) {
-		gapi.client.init({
-			apiKey: '',
-			discoveryDocs: [this.discoveryDocs]
+		window.gapi.load('client', async () => {
+			await window.gapi.client.init({
+				apiKey: this.apiKey,
+				discoveryDocs: [this.discoveryDocs]
+			});
 		});
-		this.gapiInited = true;
 	}
 
-	gsiLoaded(oauth2: oauth2Interface) {
-		this.authClient = oauth2.initTokenClient({
+	async gsiLoaded() {
+		this.authClient = window.google.accounts.oauth2.initTokenClient({
 			client_id: this.clientID,
 			scope: this.scope,
 			callback: ''
 		});
+
 		this.gisInited = true;
 	}
 }

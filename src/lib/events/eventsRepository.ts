@@ -1,6 +1,6 @@
 import { EventDataSourceFormGoogle } from './eventsDataSourceGoogle';
 
-export class eventsRepositories {
+export class EventsRepository {
 	private eventDataSource = new EventDataSourceFormGoogle();
 
 	// function processEventLocalStorage(event: event): event[] {

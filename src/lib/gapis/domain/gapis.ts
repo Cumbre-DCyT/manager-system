@@ -6,7 +6,7 @@ export interface GoogleApis {
 }
 
 export interface GoogleApisClient {
-	init: ({ apiKey, discoveryDocs }: { apiKey: string; discoveryDocs: [string] }) => void;
+	init: ({ apiKey, discoveryDocs }: { apiKey: string; discoveryDocs: [string] }) => Promise<void>;
 	getToken: () => string | null;
 	forms?: Forms;
 }
