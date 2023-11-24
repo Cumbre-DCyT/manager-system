@@ -1,10 +1,6 @@
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation';
 	import authStore from '$lib/auth/aplication/authStore';
-
-	window.authCallback = (response) => {
-		console.log(response);
-	};
 
 	async function logOut() {
 		await authStore.logOut();
@@ -14,27 +10,61 @@
 
 <svelte:head>
 	<script src="https://accounts.google.com/gsi/client" async defer></script>
+	<script src="https://apis.google.com/js/api.js" async defer></script>
 </svelte:head>
 
 <button on:click={logOut}>Salir</button>
 
-<div
-	id="g_id_onload"
-	data-client_id="69363678559-a2q8ruuaaj0jc9557iuhg8qvv2ce9h72.apps.googleusercontent.com"
-	data-context="signin"
-	data-ux_mode="popup"
-	data-callback="authCallback"
-	data-itp_support="true"
-></div>
+<h1>APP</h1>
 
-<div
-	class="g_id_signin"
-	data-type="standard"
-	data-shape="pill"
-	data-theme="filled_black"
-	data-text="signin_with"
-	data-size="large"
-	data-locale="en"
-	data-logo_alignment="left"
-></div>
-<h1>App</h1>
+<!-- 
+const newEvent: event = {
+	name: 'Nuevo Formulario',
+	formId: ''
+};
+
+if (!window.gapi.client.forms) return;
+try {
+	const response = await window.gapi.client.forms.forms.create({
+		resource: {
+			info: {
+				title: newEvent.name,
+				description: ''
+			}
+		}
+	});
+
+	console.log(window.gapi.client.forms.forms);
+
+	if (!response) return;
+
+	if (response.status == 200) {
+		const response_2 = await window.gapi.client.forms.forms.batchUpdate({
+			formId: response.result.formId,
+			requests: [
+				{
+					createItem: {
+						item: {
+							title: 'Nombre',
+							description: 'Indique su apellido',
+							questionItem: {
+								question: {
+									textQuestion: {
+										paragraph: false
+									}
+								}
+							}
+						},
+						location: {
+							index: 0
+						}
+					}
+				}
+			]
+		});
+
+		console.log(response_2);
+	}
+} catch (e) {
+	console.log(e);
+} -->

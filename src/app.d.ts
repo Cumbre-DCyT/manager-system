@@ -1,8 +1,13 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
+
+import type { GoogleApis } from '$lib/gapis/domain/gapis';
+import type { Google } from '$lib/gapis/domain/google';
+
 declare global {
 	interface Window {
-		authCallback: (response: unknown) => void;
+		google: Google;
+		gapi: GoogleApis;
 	}
 	namespace App {
 		// interface Error {}
