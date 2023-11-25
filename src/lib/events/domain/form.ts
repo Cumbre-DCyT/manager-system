@@ -4,8 +4,8 @@ export interface FormEvent {
 }
 
 export interface FormQuestion {
-	itemId: string;
-	questionId: string;
+	itemId?: string;
+	questionId?: string;
 	type: string;
 	title: string;
 	required: boolean;

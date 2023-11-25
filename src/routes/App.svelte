@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { GApisService } from '$lib';
+	import { ChoiceType, GApisService } from '$lib';
 	import { env } from '$env/dynamic/public';
-	import { ChoiceType } from '$lib/events/domain/form';
 
 	import type { NewEvent } from '$lib/events/domain/event';
 	import { EventsRepository } from '$lib/events/eventsRepository';
