@@ -1,10 +1,11 @@
 <script lang="ts">
-	import Navbar from '../components/Navbar.svelte';
 	import { GApisService } from '$lib';
-	import { EventsRepository } from '$lib/events/eventsRepository';
 	import { env } from '$env/dynamic/public';
-	import type { NewEvent } from '$lib/events/domain/event';
 	import { ChoiceType } from '$lib/events/domain/form';
+
+	import type { NewEvent } from '$lib/events/domain/event';
+	import { EventsRepository } from '$lib/events/eventsRepository';
+	import { EventDataSourceFormGoogle } from '$lib/events/eventsDataSourceGoogle';
 
 	const googleServie = new GApisService(
 		env.PUBLIC_API_KEY,
@@ -12,16 +13,23 @@
 		'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/forms.body'
 	);
 
-	let loading = false;
+	let loading = true;
 
-	const eventRepository = new EventsRepository();
+	let eventDataSource: EventDataSourceFormGoogle;
+	let eventRepository: EventsRepository;
 
 	function gsiLoaded() {
 		googleServie.gsiLoaded();
 	}
 
-	function gapiLoaded() {
-		googleServie.gapiLoaded();
+	async function gapiLoaded() {
+		await googleServie.gapiLoaded(() => {
+			let apiForm = window.gapi.client.forms;
+			eventDataSource = new EventDataSourceFormGoogle(apiForm);
+			eventRepository = new EventsRepository(eventDataSource);
+
+			loading = false;
+		});
 	}
 
 	function createForm() {
@@ -57,20 +65,18 @@
 								{ value: 'Bolivares efectivo', isOther: false }
 							]
 						}
-					},
-					{
-						required: true,
-						type: 'uploadQuestion',
-						title: 'Comprobate de pago',
-						fileUpload: {
-							folderId: '1HexrgQzMf4mAey6_dKlyR4WLriIpQgVe'
-						}
 					}
+					// {
+					// 	required: true,
+					// 	type: 'uploadQuestion',
+					// 	title: 'Comprobate de pago',
+					// 	fileUpload: {
+					// 		folderId: ''
+					// 	}
+					// }
 				]
 			};
-
 			await eventRepository.createEvent(newEvent);
-
 			loading = false;
 		});
 	}
@@ -81,10 +87,8 @@
 	<script src="https://accounts.google.com/gsi/client" async defer on:load={gsiLoaded}></script>
 </svelte:head>
 
-<Navbar />
-<h1>APP</h1>
 {#if loading}
-	<h1>creando evento</h1>
+	<h1>Cargando</h1>
 {:else}
 	<button on:click={createForm}>Create Form</button>
 {/if}

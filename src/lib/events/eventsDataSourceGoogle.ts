@@ -1,12 +1,21 @@
-import { FileType, type Forms, type Request } from '$lib/gapis/domain/Apis';
-import type { NewEvent } from './domain/event';
+import type { Forms, Reply, Request } from '$lib/gapis/domain/Apis';
+import type { Event, NewEvent } from './domain/event';
 import type { FormQuestion } from './domain/form';
 
 export class EventDataSourceFormGoogle {
 	private formsApi?: Forms;
 
 	constructor(formsApi?: Forms) {
-		this.formsApi = formsApi ?? window.gapi.client.forms;
+		this.formsApi = formsApi;
+	}
+
+	processRepliesToQuestion(replies: Reply[], questions: FormQuestion[]): FormQuestion[] {
+		return replies.map((reply, index) => {
+			questions[index].itemId = reply.createItem.itemId;
+			questions[index].questionId = reply.createItem.questionId[0];
+
+			return questions[index];
+		});
 	}
 
 	processQuestionToRequest(questions: FormQuestion[]): Request[] {
@@ -60,14 +69,12 @@ export class EventDataSourceFormGoogle {
 			}
 
 			if (item.type === 'uploadQuestion' && item.fileUpload !== undefined) {
+				//Creation of file_upload question not supported.
 				request.createItem.item.questionItem = {
 					question: {
 						required: item.required,
 						fileUploadQuestion: {
-							folderId: item.fileUpload?.folderId,
-							maxFiles: 1,
-							maxFileSize: '1000000',
-							types: [FileType.PDF, FileType.DOCUMENT, FileType.IMAGE]
+							folderId: item.fileUpload?.folderId
 						}
 					}
 				};
@@ -77,8 +84,10 @@ export class EventDataSourceFormGoogle {
 		});
 	}
 
-	async createEvent(newEvent: NewEvent) {
+	async createEvent(newEvent: NewEvent): Promise<Event> {
 		if (!this.formsApi) throw Error('No api load in global window');
+
+		let questions;
 
 		const {
 			result: { formId, error },
@@ -103,6 +112,18 @@ export class EventDataSourceFormGoogle {
 				formId,
 				requests
 			});
+
+			questions = this.processRepliesToQuestion(replies, newEvent.questions);
 		}
+
+		if (!questions) throw Error('No question');
+
+		return {
+			title: newEvent.title,
+			Form: {
+				formId,
+				questions: questions
+			}
+		};
 	}
 }

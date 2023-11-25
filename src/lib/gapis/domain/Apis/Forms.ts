@@ -64,9 +64,9 @@ export interface QuestionItem {
 		};
 		fileUploadQuestion?: {
 			folderId: string;
-			types: FileType[];
-			maxFiles: number;
-			maxFileSize: string;
+			types?: FileType[];
+			maxFiles?: number;
+			maxFileSize?: string;
 		};
 	};
 }
@@ -106,6 +106,6 @@ export interface Reply {
 }
 
 export interface CreateItemReply {
-	itemID: string;
-	questionID: string[];
+	itemId: string;
+	questionId: string[];
 }

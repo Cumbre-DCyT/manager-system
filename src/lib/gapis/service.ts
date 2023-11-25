@@ -33,12 +33,14 @@ export class GApisService {
 		}
 	}
 
-	gapiLoaded() {
+	gapiLoaded(onLoad: () => void) {
 		window.gapi.load('client', async () => {
 			await window.gapi.client.init({
 				apiKey: this.apiKey,
 				discoveryDocs: [this.discoveryDocs]
 			});
+
+			onLoad();
 		});
 	}
 

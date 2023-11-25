@@ -1,9 +1,11 @@
 export interface FormEvent {
-	formID?: string;
+	formId?: string;
 	questions: FormQuestion[];
 }
 
 export interface FormQuestion {
+	itemId: string;
+	questionId: string;
 	type: string;
 	title: string;
 	required: boolean;
@@ -19,7 +21,7 @@ export interface FormQuestion {
 	};
 }
 
-export enum ChoiceType {
+enum ChoiceType {
 	CHOICE_TYPE_UNSPECIFIED,
 	RADIO,
 	CHECKBOX,
