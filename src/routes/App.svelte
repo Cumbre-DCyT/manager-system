@@ -3,12 +3,16 @@
 	import { GApisService } from '$lib';
 	import { EventsRepository } from '$lib/events/eventsRepository';
 	import { env } from '$env/dynamic/public';
+	import type { NewEvent } from '$lib/events/domain/event';
+	import { ChoiceType } from '$lib/events/domain/form';
 
 	const googleServie = new GApisService(
 		env.PUBLIC_API_KEY,
 		env.PUBLIC_CLIENT_ID,
 		'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/forms.body'
 	);
+
+	let loading = false;
 
 	const eventRepository = new EventsRepository();
 
@@ -22,7 +26,52 @@
 
 	function createForm() {
 		googleServie.authRequestGoogle(async () => {
-			eventRepository.createEvent();
+			loading = true;
+
+			const newEvent: NewEvent = {
+				title: 'Titulo del evento',
+				questions: [
+					{ required: true, title: 'Nombre y apellido', type: 'textQuestion' },
+					{ required: true, title: 'Selecciones su fecha nacimiento', type: 'dateQuestion' },
+					{ required: true, title: 'Cédula', type: 'textQuestion' },
+					{ required: true, title: 'Teléfono', type: 'textQuestion' },
+					{
+						required: true,
+						title: '¿ Pertenece a la ucla ?',
+						type: 'choiceQuestion',
+						choice: {
+							type: ChoiceType.CHECKBOX,
+							options: [{ value: 'si', isOther: false }]
+						}
+					},
+					{ required: true, title: '¿ A que te dedicas ?', type: 'textQuestion' },
+					{
+						required: true,
+						title: '¿ Método de pago ?',
+						type: 'choiceQuestion',
+						choice: {
+							type: ChoiceType.CHECKBOX,
+							options: [
+								{ value: 'Pago móvil', isOther: false },
+								{ value: 'Divisas', isOther: false },
+								{ value: 'Bolivares efectivo', isOther: false }
+							]
+						}
+					},
+					{
+						required: true,
+						type: 'uploadQuestion',
+						title: 'Comprobate de pago',
+						fileUpload: {
+							folderId: '1HexrgQzMf4mAey6_dKlyR4WLriIpQgVe'
+						}
+					}
+				]
+			};
+
+			await eventRepository.createEvent(newEvent);
+
+			loading = false;
 		});
 	}
 </script>
@@ -34,55 +83,8 @@
 
 <Navbar />
 <h1>APP</h1>
-<button on:click={createForm}>Create Form</button>
-<!-- 
-const newEvent: event = {
-	name: 'Nuevo Formulario',
-	formId: ''
-};
-
-if (!window.gapi.client.forms) return;
-try {
-	const response = await window.gapi.client.forms.forms.create({
-		resource: {
-			info: {
-				title: newEvent.name,
-				description: ''
-			}
-		}
-	});
-
-	console.log(window.gapi.client.forms.forms);
-
-	if (!response) return;
-
-	if (response.status == 200) {
-		const response_2 = await window.gapi.client.forms.forms.batchUpdate({
-			formId: response.result.formId,
-			requests: [
-				{
-					createItem: {
-						item: {
-							title: 'Nombre',
-							description: 'Indique su apellido',
-							questionItem: {
-								question: {
-									textQuestion: {
-										paragraph: false
-									}
-								}
-							}
-						},
-						location: {
-							index: 0
-						}
-					}
-				}
-			]
-		});
-
-		console.log(response_2);
-	}
-} catch (e) {
-	console.log(e);
-} -->
+{#if loading}
+	<h1>creando evento</h1>
+{:else}
+	<button on:click={createForm}>Create Form</button>
+{/if}

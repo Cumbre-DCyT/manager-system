@@ -1,3 +1,4 @@
+import type { NewEvent } from './domain/event';
 import { EventDataSourceFormGoogle } from './eventsDataSourceGoogle';
 
 export class EventsRepository {
@@ -11,7 +12,7 @@ export class EventsRepository {
 	// 	return events;
 	// }
 
-	createEvent() {
-		this.eventDataSource.createEvent();
+	async createEvent(newEvent: NewEvent) {
+		await this.eventDataSource.createEvent(newEvent);
 	}
 }

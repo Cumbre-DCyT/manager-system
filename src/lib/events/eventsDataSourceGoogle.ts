@@ -1,4 +1,5 @@
-import type { Forms, Request } from '$lib/gapis/domain/Apis';
+import { FileType, type Forms, type Request } from '$lib/gapis/domain/Apis';
+import type { NewEvent } from './domain/event';
 import type { FormQuestion } from './domain/form';
 
 export class EventDataSourceFormGoogle {
@@ -33,11 +34,50 @@ export class EventDataSourceFormGoogle {
 				};
 			}
 
+			if (item.type === 'dateQuestion') {
+				request.createItem.item.questionItem = {
+					question: {
+						required: item.required,
+						dateQuestion: {
+							includeYear: true,
+							includeTime: false
+						}
+					}
+				};
+			}
+
+			if (item.type === 'choiceQuestion' && item.choice !== undefined) {
+				request.createItem.item.questionItem = {
+					question: {
+						required: item.required,
+						choiceQuestion: {
+							options: item.choice?.options.map((item) => item),
+							shuffle: false,
+							type: item.choice.type
+						}
+					}
+				};
+			}
+
+			if (item.type === 'uploadQuestion' && item.fileUpload !== undefined) {
+				request.createItem.item.questionItem = {
+					question: {
+						required: item.required,
+						fileUploadQuestion: {
+							folderId: item.fileUpload?.folderId,
+							maxFiles: 1,
+							maxFileSize: '1000000',
+							types: [FileType.PDF, FileType.DOCUMENT, FileType.IMAGE]
+						}
+					}
+				};
+			}
+
 			return request;
 		});
 	}
 
-	async createEvent() {
+	async createEvent(newEvent: NewEvent) {
 		if (!this.formsApi) throw Error('No api load in global window');
 
 		const {
@@ -46,7 +86,7 @@ export class EventDataSourceFormGoogle {
 		} = await this.formsApi.forms.create({
 			resource: {
 				info: {
-					title: 'Titulo',
+					title: newEvent.title,
 					description: ''
 				}
 			}
@@ -55,14 +95,14 @@ export class EventDataSourceFormGoogle {
 		if (error) throw Error(error.message);
 
 		if (status === 200) {
-			const { replies } = await this.formsApi.forms.batchUpdate({
-				formId,
-				requests: this.processQuestionToRequest([
-					{ required: true, title: 'Titulo X', type: 'textQuestion' }
-				])
-			});
+			const requests = this.processQuestionToRequest(newEvent.questions);
 
-			console.log(replies);
+			const {
+				result: { replies }
+			} = await this.formsApi.forms.batchUpdate({
+				formId,
+				requests
+			});
 		}
 	}
 }

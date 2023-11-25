@@ -53,11 +53,52 @@ export interface QuestionItem {
 	question: {
 		required: boolean;
 		textQuestion?: { paragraph: boolean };
+		dateQuestion?: {
+			includeYear: boolean;
+			includeTime: boolean;
+		};
+		choiceQuestion?: {
+			type: ChoiceType;
+			options: ChoiceQuestionOption[];
+			shuffle: boolean;
+		};
+		fileUploadQuestion?: {
+			folderId: string;
+			types: FileType[];
+			maxFiles: number;
+			maxFileSize: string;
+		};
 	};
+}
+export enum FileType {
+	FILE_TYPE_UNSPECIFIED,
+	ANY,
+	DOCUMENT,
+	PRESENTATION,
+	SPREADSHEET,
+	DRAWING,
+	PDF,
+	IMAGE,
+	VIDEO,
+	AUDIO
+}
+
+export enum ChoiceType {
+	CHOICE_TYPE_UNSPECIFIED,
+	RADIO,
+	CHECKBOX,
+	DROP_DOWN
+}
+
+export interface ChoiceQuestionOption {
+	value: string;
+	isOther: boolean;
 }
 
 export interface BatchUpdateFormResponse {
-	replies: Reply[];
+	result: {
+		replies: Reply[];
+	};
 }
 
 export interface Reply {
