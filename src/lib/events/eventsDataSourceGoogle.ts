@@ -1,87 +1,21 @@
-import type { Forms, Reply, Request } from '$lib/gapis/domain/Apis';
+import type { Forms } from '$lib/gapis/domain/Apis';
+
+import { v4 as uuidv4 } from 'uuid';
+
 import type { Event, NewEvent } from './domain/event';
-import type { FormQuestion } from './domain/form';
+import type { FormEvent } from '../forms/formTypes';
+
+import {
+	processQuestionToRequest,
+	processRepliesToQuestion,
+	processResponseGoogleToResponseEvent
+} from '$lib/forms';
 
 export class EventDataSourceFormGoogle {
 	private formsApi?: Forms;
 
 	constructor(formsApi?: Forms) {
 		this.formsApi = formsApi;
-	}
-
-	processRepliesToQuestion(replies: Reply[], questions: FormQuestion[]): FormQuestion[] {
-		return replies.map((reply, index) => {
-			questions[index].itemId = reply.createItem.itemId;
-			questions[index].questionId = reply.createItem.questionId[0];
-
-			return questions[index];
-		});
-	}
-
-	processQuestionToRequest(questions: FormQuestion[]): Request[] {
-		return questions.map((item, index) => {
-			const request: Request = {
-				createItem: {
-					item: {
-						title: item.title,
-						description: ''
-					},
-					location: {
-						index
-					}
-				}
-			};
-
-			if (item.type === 'textQuestion') {
-				request.createItem.item.questionItem = {
-					question: {
-						required: item.required,
-						textQuestion: {
-							paragraph: false
-						}
-					}
-				};
-			}
-
-			if (item.type === 'dateQuestion') {
-				request.createItem.item.questionItem = {
-					question: {
-						required: item.required,
-						dateQuestion: {
-							includeYear: true,
-							includeTime: false
-						}
-					}
-				};
-			}
-
-			if (item.type === 'choiceQuestion' && item.choice !== undefined) {
-				request.createItem.item.questionItem = {
-					question: {
-						required: item.required,
-						choiceQuestion: {
-							options: item.choice?.options.map((item) => item),
-							shuffle: false,
-							type: item.choice.type
-						}
-					}
-				};
-			}
-
-			if (item.type === 'uploadQuestion' && item.fileUpload !== undefined) {
-				//Creation of file_upload question not supported.
-				request.createItem.item.questionItem = {
-					question: {
-						required: item.required,
-						fileUploadQuestion: {
-							folderId: item.fileUpload?.folderId
-						}
-					}
-				};
-			}
-
-			return request;
-		});
 	}
 
 	async createEvent(newEvent: NewEvent): Promise<Event> {
@@ -104,7 +38,7 @@ export class EventDataSourceFormGoogle {
 		if (error) throw Error(error.message);
 
 		if (status === 200) {
-			const requests = this.processQuestionToRequest(newEvent.questions);
+			const requests = await processQuestionToRequest(newEvent.form.questions);
 
 			const {
 				result: { replies }
@@ -113,17 +47,32 @@ export class EventDataSourceFormGoogle {
 				requests
 			});
 
-			questions = this.processRepliesToQuestion(replies, newEvent.questions);
+			questions = await processRepliesToQuestion(replies, newEvent.form.questions);
 		}
 
 		if (!questions) throw Error('No question');
 
 		return {
+			id: uuidv4(),
 			title: newEvent.title,
-			Form: {
+			form: {
 				formId,
 				questions: questions
 			}
 		};
+	}
+
+	async getAsisten(form: FormEvent): Promise<FormEvent> {
+		if (!form?.formId) throw Error('no form');
+
+		const {
+			result: { responses }
+		} = await this.formsApi!.forms.responses.list({ formId: form?.formId });
+
+		if (!responses) throw Error('No responses');
+
+		form.responses = await processResponseGoogleToResponseEvent(responses, form.questions);
+
+		return form;
 	}
 }

@@ -2,6 +2,9 @@ export interface Forms {
 	forms: {
 		create: (data: CreateFormData) => Promise<CreateFormResponse>;
 		batchUpdate: (data: BatchUpdateFormData) => Promise<BatchUpdateFormResponse>;
+		responses: {
+			list: (data: ResponsesFormListData) => Promise<ResponsesFormListResponse>;
+		};
 	};
 }
 
@@ -30,6 +33,40 @@ export interface CreateFormResponse {
 export interface BatchUpdateFormData {
 	formId: string;
 	requests: Request[];
+}
+
+export interface ResponsesFormListData {
+	formId: string;
+	//timestamp > N
+	//timestamp >= N
+	//Ejemplos: “2014-10-02T15:01:23Z” y “2014-10-02T15:01:23.045123456Z”.
+	filter?: string;
+	pageSize?: number;
+	pageToken?: string;
+}
+
+export interface ResponsesFormListResponse {
+	result: {
+		responses: FormResponse[];
+		nextPageToken: string;
+	};
+}
+
+export interface FormResponse {
+	createTime: string;
+	lastSubmittedTime: string;
+	respondentEmail: string;
+	answers: {
+		readonly [index: string]: AnswerForm;
+	};
+	totalScore: number;
+}
+
+export interface AnswerForm {
+	questionId: string;
+	textAnswers: {
+		answers: { value: string }[];
+	};
 }
 
 export interface Request {
@@ -70,6 +107,7 @@ export interface QuestionItem {
 		};
 	};
 }
+
 export enum FileType {
 	FILE_TYPE_UNSPECIFIED,
 	ANY,

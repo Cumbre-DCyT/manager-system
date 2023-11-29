@@ -1,2 +1,2 @@
 export * from './event';
-export * from './form';
+export * from '../../forms/formTypes';

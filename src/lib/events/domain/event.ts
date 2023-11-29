@@ -1,11 +1,14 @@
-import type { FormEvent, FormQuestion } from './form';
+import type { FormEvent, FormQuestion } from '../../forms/formTypes';
 
 export interface Event {
+	id?: string;
 	title: string;
-	Form: FormEvent;
+	form: FormEvent;
 }
 
 export interface NewEvent {
 	title: string;
-	questions: FormQuestion[];
+	form: {
+		questions: FormQuestion[];
+	};
 }
