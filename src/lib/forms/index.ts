@@ -3,6 +3,11 @@ import type { FormQuestion } from '.';
 
 export * from './formTypes';
 
+/**
+ * Process an array of form questions and convert them into an array of Google API requests.
+ * @param questions - The array of form questions.
+ * @returns An array of Google API requests.
+ */
 export async function processQuestionToRequest(
 	questions: FormQuestion[]
 ): Promise<RequestGoogleApi[]> {
@@ -19,51 +24,57 @@ export async function processQuestionToRequest(
 			}
 		};
 
-		if (item.type === 'textQuestion') {
-			request.createItem.item.questionItem = {
-				question: {
-					required: item.required,
-					textQuestion: {
-						paragraph: false
+		switch (item.type) {
+			case 'textQuestion':
+				request.createItem.item.questionItem = {
+					question: {
+						required: item.required,
+						textQuestion: {
+							paragraph: false
+						}
 					}
-				}
-			};
-		}
+				};
+				break;
 
-		if (item.type === 'dateQuestion') {
-			request.createItem.item.questionItem = {
-				question: {
-					required: item.required,
-					dateQuestion: {
-						includeYear: true,
-						includeTime: false
+			case 'dateQuestion':
+				request.createItem.item.questionItem = {
+					question: {
+						required: item.required,
+						dateQuestion: {
+							includeYear: true,
+							includeTime: false
+						}
 					}
-				}
-			};
-		}
+				};
+				break;
 
-		if (item.type === 'choiceQuestion' && item.choice !== undefined) {
-			request.createItem.item.questionItem = {
-				question: {
-					required: item.required,
-					choiceQuestion: {
-						options: item.choice?.options.map((item) => item),
-						shuffle: false,
-						type: item.choice.type
-					}
+			case 'choiceQuestion':
+				if (item.choice !== undefined) {
+					request.createItem.item.questionItem = {
+						question: {
+							required: item.required,
+							choiceQuestion: {
+								options: item.choice.options.map((item) => item),
+								shuffle: false,
+								type: item.choice.type
+							}
+						}
+					};
 				}
-			};
-		}
+				break;
 
-		if (item.type === 'uploadQuestion' && item.fileUpload !== undefined) {
-			request.createItem.item.questionItem = {
-				question: {
-					required: item.required,
-					fileUploadQuestion: {
-						folderId: item.fileUpload?.folderId
-					}
+			case 'uploadQuestion':
+				if (item.fileUpload !== undefined) {
+					request.createItem.item.questionItem = {
+						question: {
+							required: item.required,
+							fileUploadQuestion: {
+								folderId: item.fileUpload.folderId
+							}
+						}
+					};
 				}
-			};
+				break;
 		}
 
 		return request;
@@ -75,9 +86,10 @@ export async function processRepliesToQuestion(
 	questions: FormQuestion[]
 ): Promise<FormQuestion[]> {
 	return replies.map((reply, index) => {
-		questions[index].itemId = reply.createItem.itemId;
-		questions[index].questionId = reply.createItem.questionId[0];
-		return questions[index];
+		const question = questions[index];
+		question.itemId = reply.createItem.itemId;
+		question.questionId = reply.createItem.questionId[0];
+		return question;
 	});
 }
 
@@ -89,18 +101,20 @@ export async function processResponseGoogleToResponseEvent(
 		const newResponse: FormEventResponse = {};
 
 		questions.forEach((question, index) => {
-			if (!question.propertyName) return;
+			if (!question.propertyName || !question.questionId) return;
 
 			const { answers } = response;
 
-			for (const property in answers) {
-				if (answers[property].questionId === question.questionId) {
-					newResponse[question.propertyName] = {
-						index,
-						questionId: question.questionId,
-						value: answers[property].textAnswers.answers[0].value
-					};
-				}
+			const matchingAnswer = Object.values(answers).find(
+				(answer) => answer.questionId === question.questionId
+			);
+
+			if (matchingAnswer) {
+				newResponse[question.propertyName] = {
+					index,
+					questionId: question.questionId,
+					value: matchingAnswer.textAnswers.answers[0].value
+				};
 			}
 		});
 
