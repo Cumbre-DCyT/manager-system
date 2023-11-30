@@ -6,7 +6,7 @@
 	import { EventsRepository } from '$lib/events/eventsRepository';
 	import { EventDataSourceFormGoogle } from '$lib/events/eventsDataSourceGoogle';
 
-	import { templates } from './templates';
+	import { templates } from '../lib/data/templates';
 
 	const googleServie = new GApisService(
 		env.PUBLIC_API_KEY,
