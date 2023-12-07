@@ -36,5 +36,8 @@
 		"vite": "^4.4.2",
 		"vitest": "^0.32.2"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"googleapis": "^129.0.0"
+	}
 }
