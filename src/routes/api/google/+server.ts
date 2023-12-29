@@ -7,7 +7,7 @@ export async function POST() {
 		access_type: 'offline',
 		scope: scopes,
 		include_granted_scopes: true,
-		prompt: 'none'
+		prompt: 'consent'
 	});
 
 	return new Response(JSON.stringify({ url }));
