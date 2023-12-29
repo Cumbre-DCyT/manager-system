@@ -38,6 +38,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@googleapis/forms": "^2.0.5",
 		"googleapis": "^129.0.0"
 	}
 }

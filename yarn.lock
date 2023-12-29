@@ -167,6 +167,13 @@
   resolved "https://registry.yarnpkg.com/@fastify/busboy/-/busboy-2.1.0.tgz#0709e9f4cb252351c609c6e6d8d6779a8d25edff"
   integrity sha512-+KpH+QxZU7O4675t3mnkQKcZZg56u+K/Ct2K+N2AZYNVK8kyeo/bI18tI8aPm3tvNNRyTWfj6s5tnGNlcbQRsA==
 
+"@googleapis/forms@^2.0.5":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@googleapis/forms/-/forms-2.0.5.tgz#d53802ef3b2da59bee60cdb5012d43533b164bbd"
+  integrity sha512-cWwainoMlokRUNIehV7qirP21ASPwDBKI/2MMPrU45d3ADNVT9WzmhhJGB3JSO6sD9tQiqgTZZL2jln8Xys8zw==
+  dependencies:
+    googleapis-common "^7.0.0"
+
 "@humanwhocodes/config-array@^0.11.13":
   version "0.11.13"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.13.tgz#075dc9684f40a531d9b26b0822153c1e832ee297"
