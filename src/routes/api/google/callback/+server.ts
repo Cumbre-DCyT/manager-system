@@ -8,8 +8,8 @@ export async function GET({ url, cookies }) {
 
 	googleAuthClient.setCredentials(tokens);
 
-	cookies.set('token', tokens.access_token as string, { sameSite: true });
-	cookies.set('refresh_token', tokens.refresh_token as string, { sameSite: true });
+	cookies.set('token', tokens.access_token as string, { secure: true, path: '/' });
+	cookies.set('refresh_token', tokens.refresh_token as string, { secure: true, path: '/' });
 
 	throw redirect(302, '/');
 }
